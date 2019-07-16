@@ -205,7 +205,6 @@ class ViewController: UIViewController {
     func readInContent() -> [String] {
         var contentAsLines = [String]()
         if let levelFileURL = Bundle.main.url(forResource: "level\(level)", withExtension: "txt") {
-            print(levelFileURL)
             if let levelContents = try? String(contentsOf: levelFileURL) {
                 contentAsLines = levelContents.components(separatedBy: "\n")
             }
@@ -220,7 +219,7 @@ class ViewController: UIViewController {
         var lines = [String]()
         
         lines = readInContent()
-        print(lines)
+
         lines.shuffle()
         
         for (index, line) in lines.enumerated() {
@@ -243,8 +242,6 @@ class ViewController: UIViewController {
             letterButtons.shuffle()
             
             if letterButtons.count == letterBits.count {
-                
-                // here is what's failing but why
                 
                 for i in 0..<letterButtons.count {
                     letterButtons[i].setTitle(letterBits[i], for: .normal)

@@ -112,7 +112,6 @@ class ViewController: UIViewController {
             buttonsView.topAnchor.constraint(equalTo: submit.bottomAnchor, constant: 20),
             buttonsView.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor, constant: -20)
             
-            // more constraints go here
             ])
         
         let width = 150
@@ -201,10 +200,17 @@ class ViewController: UIViewController {
         }
         
         activatedButtons.removeAll()
-        
-        
-        
-        
+    }
+    
+    func readInContent() -> [String] {
+        var contentAsLines = [String]()
+        if let levelFileURL = Bundle.main.url(forResource: "level\(level)", withExtension: "txt") {
+            print(levelFileURL)
+            if let levelContents = try? String(contentsOf: levelFileURL) {
+                contentAsLines = levelContents.components(separatedBy: "\n")
+            }
+        }
+        return contentAsLines
     }
     
     func loadLevel() {
@@ -213,62 +219,42 @@ class ViewController: UIViewController {
         var letterBits = [String]()
         var lines = [String]()
         
-        // where is the right place to end this background thread?
-        // maybe the getting the content out of the level should be in a separate method?
+        lines = readInContent()
+        print(lines)
+        lines.shuffle()
         
-        // I need some kind of test to make sure level has loaded before assigning button labels
-        
+        for (index, line) in lines.enumerated() {
+            let parts = line.components(separatedBy: ": ")
+            let answer = parts[0]
+            let clue = parts[1]
             
-            if let levelFileURL = Bundle.main.url(forResource: "level\(String(describing: level))", withExtension: "txt") {
-                //if the following works as expected, the whole level
-                //ends up in a string levelFileURL
-                if let levelContents = try? String(contentsOf: levelFileURL) {
-                    // then we separate that string into I guess a
-                    // string array so each member is one line
-                    lines = levelContents.components(separatedBy: "\n")
-                    // then shuffle this array so users see clues in
-                    // a different order each time the game is played
+            clueString += "\(index + 1). \(clue)\n"
+            
+            let solutionWord = answer.replacingOccurrences(of: "|", with: "")
+            solutionsString += "\(solutionWord.count) letters\n"
+            solutions.append(solutionWord)
+            
+            let bits = answer.components(separatedBy: "|")
+            letterBits += bits
+            
+            cluesLabel.text = clueString.trimmingCharacters(in: .whitespacesAndNewlines)
+            answersLabel.text = solutionsString.trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            letterButtons.shuffle()
+            
+            if letterButtons.count == letterBits.count {
                 
-                lines.shuffle()
+                // here is what's failing but why
                 
-                for (index, line) in lines.enumerated() {
-                    let parts = line.components(separatedBy: ": ")
-                    let answer = parts[0]
-                    let clue = parts[1]
+                for i in 0..<letterButtons.count {
+                    letterButtons[i].setTitle(letterBits[i], for: .normal)
                     
-                    clueString += "\(index + 1). \(clue)\n"
-                    
-                    let solutionWord = answer.replacingOccurrences(of: "|", with: "")
-                    solutionsString += "\(solutionWord.count) letters\n"
-                    solutions.append(solutionWord)
-                    
-                    let bits = answer.components(separatedBy: "|")
-                    letterBits += bits
-                    
-                    cluesLabel.text = clueString.trimmingCharacters(in: .whitespacesAndNewlines)
-                    answersLabel.text = solutionsString.trimmingCharacters(in: .whitespacesAndNewlines)
-                    
-                    letterButtons.shuffle()
-                    
-                    if letterButtons.count == letterBits.count {
-                        
-                        // here is what's failing but why
-                        
-                        for i in 0..<letterButtons.count {
-                            letterButtons[i].setTitle(letterBits[i], for: .normal)
-                            
-                        }
-                    }
                 }
             }
         }
-        
-        
-        
-        
-        
     }
-    
-    
 }
+
+
+
 
